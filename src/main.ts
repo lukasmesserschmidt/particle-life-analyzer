@@ -1,14 +1,15 @@
 import { getDevice } from './webgpu/device';
 import { Controller } from './controller';
 import type { SimulationParams } from './simulation/parameters';
+import { SPACE } from './types';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-canvas.width = 1000;
-canvas.height = 1000;
+canvas.width = SPACE;
+canvas.height = SPACE;
 const device = await getDevice();
 const controller = new Controller(canvas, device);
 
-function getParamsFromInputs() {
+function getParamsFromInputs(): SimulationParams {
   const preferedParticleCount = parseInt(
     (document.getElementById('preferredParticleCount') as HTMLInputElement)
       .value,

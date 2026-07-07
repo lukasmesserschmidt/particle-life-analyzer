@@ -1,7 +1,7 @@
 function calcNormalizedMsd(
-  initialPositions: Array<Array<number>>,
-  currentPositions: Array<Array<number>>,
-) {
+  initialPositions: number[][],
+  currentPositions: number[][],
+): number {
   const dimensions = initialPositions[0].length;
   const particleCount = initialPositions.length;
   let totalDistSq = 0.0;
@@ -26,4 +26,4 @@ function calcNormalizedMsd(
   return msd / maxPossibleDistSq;
 }
 
-export { calcNormalizedMsd as calcMsd };
+export { calcNormalizedMsd };

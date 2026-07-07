@@ -3,22 +3,17 @@ import type { StatsContext } from './stats_context';
 import { getPositions } from '../utils';
 
 import { statsChart } from './stats_chart';
-import { calcMsd } from './normalized_msd';
-import { calcSpatialEntropy } from './normalized_spatial_entropy';
+import { calcNormalizedMsd } from './normalized_msd';
+import { calcNormalizedSpatialEntropy } from './normalized_spatial_entropy';
 import { calcNormalizedAverageDistance } from './normalized_average_distance';
 
 export class Stats {
-  private device: GPUDevice;
   private params: SimulationParams;
 
   private initialPositions: number[][];
 
   private statsBuffer: GPUBuffer;
   private statsStagingBuffer: GPUBuffer;
-
-  constructor(device: GPUDevice) {
-    this.device = device;
-  }
 
   init(params: SimulationParams, particleData: Float32Array) {
     this.params = params;
@@ -43,8 +38,13 @@ export class Stats {
 
   update(statsContext: StatsContext) {
     // calculate statistics
-    const msd = calcMsd(this.initialPositions, statsContext.currentPositions);
-    const spatialEntropy = calcSpatialEntropy(statsContext.currentPositions);
+    const msd = calcNormalizedMsd(
+      this.initialPositions,
+      statsContext.currentPositions,
+    );
+    const spatialEntropy = calcNormalizedSpatialEntropy(
+      statsContext.currentPositions,
+    );
     const normalizedAverageDistance = calcNormalizedAverageDistance(
       statsContext.totalDistance,
       this.params.particleCount,

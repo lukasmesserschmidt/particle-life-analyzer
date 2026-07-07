@@ -1,4 +1,4 @@
-async function getDevice() {
+async function getDevice(): Promise<GPUDevice> {
   const adapter = await navigator.gpu?.requestAdapter();
   const device = await adapter?.requestDevice();
   if (!device) {

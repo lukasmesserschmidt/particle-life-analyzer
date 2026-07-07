@@ -1,5 +1,5 @@
 function calcNormalizedSpatialEntropy(
-  positions: Array<Array<number>>,
+  positions: number[][],
   kIntervals: number = 8,
 ): number {
   const dimensions = positions[0].length;
@@ -31,4 +31,4 @@ function calcNormalizedSpatialEntropy(
   return entropy / maxEntropy;
 }
 
-export { calcNormalizedSpatialEntropy as calcSpatialEntropy };
+export { calcNormalizedSpatialEntropy };

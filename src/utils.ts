@@ -13,7 +13,7 @@ function getPositions(
   data: Float32Array,
   particleCount: number,
   dimensions: number,
-) {
+): number[][] {
   return Array.from({ length: particleCount }, (_, i) => {
     const startIndex = i * (MAX_DIM * 2);
     return Array.from({ length: dimensions }, (_, d) => data[startIndex + d]);

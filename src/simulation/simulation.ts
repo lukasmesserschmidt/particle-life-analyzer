@@ -184,7 +184,7 @@ class Simulation {
     };
   }
 
-  public getParticleData() {
+  public getParticleData(): Float32Array {
     return this.particleData;
   }
 }
