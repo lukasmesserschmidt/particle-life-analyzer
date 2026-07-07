@@ -7,6 +7,10 @@ import { calcNormalizedMsd } from './normalized_msd';
 import { calcNormalizedSpatialEntropy } from './normalized_spatial_entropy';
 import { calcNormalizedAverageDistance } from './normalized_average_distance';
 
+/**
+ * Statistics controller for tracking and visualizing particle simulation metrics.
+ * Manages Chart.js visualization and calculates normalized statistics.
+ */
 export class Stats {
   private params: SimulationParams;
 
@@ -15,6 +19,11 @@ export class Stats {
   private statsBuffer: GPUBuffer;
   private statsStagingBuffer: GPUBuffer;
 
+  /**
+   * Initialize statistics with simulation parameters and initial particle data.
+   * @param params - Simulation parameters including particle count and dimensions
+   * @param particleData - Initial particle positions and velocities
+   */
   init(params: SimulationParams, particleData: Float32Array) {
     this.params = params;
 
@@ -36,13 +45,17 @@ export class Stats {
     statsChart.update('none');
   }
 
+  /**
+   * Update statistics with current simulation state and refresh chart.
+   * @param statsContext - Current simulation context including positions and time
+   */
   update(statsContext: StatsContext) {
     // calculate statistics
-    const msd = calcNormalizedMsd(
+    const normalizedMsd = calcNormalizedMsd(
       this.initialPositions,
       statsContext.currentPositions,
     );
-    const spatialEntropy = calcNormalizedSpatialEntropy(
+    const normalizedSpatialEntropy = calcNormalizedSpatialEntropy(
       statsContext.currentPositions,
     );
     const normalizedAverageDistance = calcNormalizedAverageDistance(
@@ -52,8 +65,8 @@ export class Stats {
     );
 
     // update charts
-    statsChart.data.datasets[0].data.push(msd);
-    statsChart.data.datasets[1].data.push(spatialEntropy);
+    statsChart.data.datasets[0].data.push(normalizedMsd);
+    statsChart.data.datasets[1].data.push(normalizedSpatialEntropy);
     statsChart.data.datasets[2].data.push(normalizedAverageDistance);
     statsChart.data.labels!.push(statsContext.currentTime);
     statsChart.options.scales!.x!.max = statsContext.currentTime;

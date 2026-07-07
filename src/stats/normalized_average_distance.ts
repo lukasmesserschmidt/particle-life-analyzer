@@ -1,3 +1,10 @@
+/**
+ * Calculate normalized average distance between particles.
+ * @param totalDistance - Sum of all pairwise distances calculated on GPU
+ * @param particleCount - Number of particles in the simulation
+ * @param dimensions - Number of spatial dimensions
+ * @returns Normalized average distance value between 0 and 1
+ */
 function calcNormalizedAverageDistance(
   totalDistance: number,
   particleCount: number,

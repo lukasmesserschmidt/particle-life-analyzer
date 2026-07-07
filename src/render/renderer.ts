@@ -6,6 +6,10 @@ import { createBindGroup } from '../webgpu/bind_groups';
 import { renderShaderCode } from '../webgpu/shaders';
 import { createDepthTexture } from '../webgpu/textures';
 
+/**
+ * WebGPU renderer for particle visualization.
+ * Manages render pipeline, depth texture, and double-buffered bind groups.
+ */
 class Renderer {
   private device: GPUDevice;
   private params: SimulationParams;
@@ -16,6 +20,11 @@ class Renderer {
   private renderBindGroupB: GPUBindGroup;
   private currentRenderBindGroup: GPUBindGroup;
 
+  /**
+   * Initialize the renderer with WebGPU device and render pipeline.
+   * @param device - The WebGPU device for GPU operations
+   * @param presentationFormat - The preferred canvas texture format
+   */
   constructor(device: GPUDevice, presentationFormat: GPUTextureFormat) {
     this.device = device;
 
@@ -32,6 +41,12 @@ class Renderer {
     );
   }
 
+  /**
+   * Initialize renderer with canvas, parameters, and GPU buffers.
+   * @param canvas - The HTML canvas element for rendering
+   * @param params - Simulation parameters including particle count
+   * @param renderContext - GPU buffers containing simulation data for rendering
+   */
   public init(
     canvas: HTMLCanvasElement,
     params: SimulationParams,
@@ -65,6 +80,11 @@ class Renderer {
     this.currentRenderBindGroup = this.renderBindGroupA;
   }
 
+  /**
+   * Render particles to the canvas using WebGPU.
+   * @param context - The WebGPU canvas context for rendering
+   * @param commandEncoder - WebGPU command encoder for recording render commands
+   */
   render(context: GPUCanvasContext, commandEncoder: GPUCommandEncoder) {
     const textureView = context.getCurrentTexture().createView();
     const depthTextureView = this.depthTexture.createView();
@@ -93,6 +113,9 @@ class Renderer {
     passEncoder.end();
   }
 
+  /**
+   * Swap between double-buffered bind groups for ping-pong buffering.
+   */
   public swapBindGroups() {
     this.currentRenderBindGroup =
       this.currentRenderBindGroup === this.renderBindGroupA

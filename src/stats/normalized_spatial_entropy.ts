@@ -1,3 +1,10 @@
+/**
+ * Calculate normalized spatial entropy of particle distribution.
+ * Measures how uniformly particles are distributed across spatial cells.
+ * @param positions - Array of particle positions
+ * @param kIntervals - Number of intervals per dimension for spatial binning (default: 8)
+ * @returns Normalized entropy value between 0 and 1
+ */
 function calcNormalizedSpatialEntropy(
   positions: number[][],
   kIntervals: number = 8,

@@ -5,6 +5,10 @@ import { Renderer } from './render/renderer';
 import { Stats } from './stats/stats';
 import { getPositions } from './utils';
 
+/**
+ * Main application controller that coordinates simulation, rendering, and statistics.
+ * Manages the WebGPU context and orchestrates the animation loop.
+ */
 class Controller {
   private canvas: HTMLCanvasElement;
   private context: GPUCanvasContext;
@@ -18,6 +22,11 @@ class Controller {
   private currentTime: number;
   private animationFrameId: number;
 
+  /**
+   * Initialize the controller with WebGPU canvas context and device.
+   * @param canvas - The HTML canvas element for WebGPU rendering
+   * @param device - The WebGPU device for GPU operations
+   */
   constructor(canvas: HTMLCanvasElement, device: GPUDevice) {
     this.canvas = canvas;
     this.context = canvas.getContext('webgpu') as GPUCanvasContext;
@@ -33,9 +42,13 @@ class Controller {
 
     this.simulation = new Simulation(device);
     this.renderer = new Renderer(device, presentationFormat);
-    this.stats = new Stats(device);
+    this.stats = new Stats();
   }
 
+  /**
+   * Initialize the simulation with the given parameters.
+   * @param params - Simulation parameters including particle count, dimensions, etc.
+   */
   public init(params: SimulationParams) {
     this.params = params;
 
@@ -43,6 +56,10 @@ class Controller {
     this.initStats();
   }
 
+  /**
+   * Initialize the simulation subsystem and renderer.
+   * Cancels any existing animation frame before reinitializing.
+   */
   private initSimulation() {
     // cancel previous animation frame
     if (this.animationFrameId) {
@@ -54,20 +71,29 @@ class Controller {
     this.renderer.init(this.canvas, this.params, renderContext);
   }
 
+  /**
+   * Initialize the statistics subsystem with current particle data.
+   */
   private initStats() {
     this.currentTime = 0.0;
     this.stats.init(this.params, this.simulation.getParticleData());
   }
 
+  /**
+   * Start the animation loop for continuous simulation updates.
+   */
   public startUpdateLoop() {
     this.animationFrameId = requestAnimationFrame(this.update.bind(this));
   }
 
+  /**
+   * Main update loop: compute simulation, render, update statistics, and schedule next frame.
+   */
   private async update() {
     const commandEncoder = this.device.createCommandEncoder();
 
     this.simulation.compute(commandEncoder);
-    // this.renderer.render(this.context, commandEncoder);
+    this.renderer.render(this.context, commandEncoder);
 
     const { outputBuffer, stagingBuffer } = this.simulation.getOutputBuffers();
     const { statsBuffer, statsStagingBuffer } =

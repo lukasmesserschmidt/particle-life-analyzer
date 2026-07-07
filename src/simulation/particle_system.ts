@@ -2,13 +2,25 @@ import { createMulberry32 } from '../utils';
 import { MAX_DIM } from '../types';
 import type { SimulationParams } from './parameters';
 
-class ParticleSystem {
+/**
+ * Particle data generator for simulation initialization.
+ * Creates particle positions, velocities, colors, and interaction relations.
+ */
+class ParticleDataGenerator {
   private params: SimulationParams;
 
+  /**
+   * Initialize particle system with simulation parameters.
+   * @param params - Simulation parameters including particle count, dimensions, etc.
+   */
   constructor(params: SimulationParams) {
     this.params = params;
   }
 
+  /**
+   * Create simulation parameters as a binary buffer for GPU upload.
+   * @returns ArrayBuffer containing packed simulation parameters
+   */
   public createSimParamsData(): ArrayBuffer {
     const simParamsData = new ArrayBuffer(32);
     const view = new DataView(simParamsData);
@@ -23,6 +35,10 @@ class ParticleSystem {
     return simParamsData;
   }
 
+  /**
+   * Create interaction relation matrix between particle groups.
+   * @returns Float32Array of interaction strengths between groups
+   */
   public createRelationsData(): Float32Array {
     const relations = Array(this.params.groupCount)
       .fill(0)
@@ -41,6 +57,10 @@ class ParticleSystem {
     return new Float32Array(relations.flat());
   }
 
+  /**
+   * Create random colors for each particle group.
+   * @returns Float32Array of RGBA color values for each group
+   */
   public createColorsData(): Float32Array {
     const colorRandom = createMulberry32(this.params.seed);
     const colors = Array(this.params.groupCount)
@@ -50,6 +70,10 @@ class ParticleSystem {
     return new Float32Array(colors.flat());
   }
 
+  /**
+   * Create particle data with random positions and zero velocities.
+   * @returns Float32Array containing particle positions and velocities
+   */
   public createParticleData(): Float32Array {
     const particles = Array(this.params.particleCount)
       .fill(0)
@@ -68,6 +92,11 @@ class ParticleSystem {
     return new Float32Array(particles.flat());
   }
 
+  /**
+   * Create particle data with grid-based positions and zero velocities.
+   * Useful for structured initial conditions.
+   * @returns Float32Array containing particle positions and velocities in grid layout
+   */
   public createParticleDataGrid(): Float32Array {
     const particles = Array(this.params.particleCount)
       .fill(0)
@@ -99,4 +128,4 @@ class ParticleSystem {
   }
 }
 
-export { ParticleSystem };
+export { ParticleDataGenerator };

@@ -1,3 +1,10 @@
+/**
+ * Calculate normalized mean squared displacement of particles from their initial positions.
+ * Accounts for periodic boundary conditions in the simulation space.
+ * @param initialPositions - Array of initial particle positions
+ * @param currentPositions - Array of current particle positions
+ * @returns Normalized MSD value between 0 and 1
+ */
 function calcNormalizedMsd(
   initialPositions: number[][],
   currentPositions: number[][],

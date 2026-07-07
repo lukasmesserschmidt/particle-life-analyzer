@@ -16,14 +16,19 @@ import { createComputePipeline } from '../webgpu/pipelines';
 import { createBindGroup } from '../webgpu/bind_groups';
 import { computeShaderCode } from '../webgpu/shaders';
 
-import { ParticleSystem } from './particle_system';
+import { ParticleDataGenerator } from './particle_system';
+import { WORKGROUP_SIZE } from '../types';
 
+/**
+ * Core simulation engine using WebGPU compute shaders for particle physics.
+ * Manages GPU buffers, compute pipelines, and double-buffering for efficient particle updates.
+ */
 class Simulation {
   private params: SimulationParams;
 
   private device: GPUDevice;
 
-  private particleSystem: ParticleSystem;
+  private particleDataGenerator: ParticleDataGenerator;
   private particleData: Float32Array;
   private simParamsBuffer: GPUBuffer;
   private statsBuffer: GPUBuffer;
@@ -36,8 +41,12 @@ class Simulation {
   private computePipeline: GPUComputePipeline;
   private computeBindGroupA: GPUBindGroup;
   private computeBindGroupB: GPUBindGroup;
-  private currentComputeBindeGroup: GPUBindGroup;
+  private currentComputeBindGroup: GPUBindGroup;
 
+  /**
+   * Initialize the simulation with WebGPU device and compute pipeline.
+   * @param device - The WebGPU device for GPU operations
+   */
   constructor(device: GPUDevice) {
     this.device = device;
 
@@ -51,6 +60,10 @@ class Simulation {
     this.computePipeline = createComputePipeline(device, computeShaderModule);
   }
 
+  /**
+   * Initialize simulation with given parameters, creating all necessary GPU buffers and bind groups.
+   * @param params - Simulation parameters including particle count, dimensions, etc.
+   */
   public init(params: SimulationParams) {
     this.params = params;
 
@@ -65,13 +78,13 @@ class Simulation {
     if (this.statsStagingBuffer) this.statsStagingBuffer.destroy();
 
     // create particle system
-    this.particleSystem = new ParticleSystem(params);
+    this.particleDataGenerator = new ParticleDataGenerator(params);
 
     // create buffer data
-    const simParamsData = this.particleSystem.createSimParamsData();
-    const relationData = this.particleSystem.createRelationsData();
-    const colorData = this.particleSystem.createColorsData();
-    this.particleData = this.particleSystem.createParticleData();
+    const simParamsData = this.particleDataGenerator.createSimParamsData();
+    const relationData = this.particleDataGenerator.createRelationsData();
+    const colorData = this.particleDataGenerator.createColorsData();
+    this.particleData = this.particleDataGenerator.createParticleData();
 
     // create buffers
     this.simParamsBuffer = createSimParamsBuffer(
@@ -141,26 +154,37 @@ class Simulation {
       ],
     );
 
-    this.currentComputeBindeGroup = this.computeBindGroupA;
+    this.currentComputeBindGroup = this.computeBindGroupA;
   }
 
+  /**
+   * Execute compute shader to update particle positions and velocities.
+   * @param commandEncoder - WebGPU command encoder for recording compute commands
+   */
   public compute(commandEncoder: GPUCommandEncoder) {
     const passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(this.computePipeline);
-    passEncoder.setBindGroup(0, this.currentComputeBindeGroup);
+    passEncoder.setBindGroup(0, this.currentComputeBindGroup);
 
-    const workgrouCount = Math.ceil(this.params.particleCount / 32);
+    const workgrouCount = Math.ceil(this.params.particleCount / WORKGROUP_SIZE);
     passEncoder.dispatchWorkgroups(workgrouCount);
     passEncoder.end();
   }
 
+  /**
+   * Swap between double-buffered bind groups for ping-pong buffering.
+   */
   public swapBindGroups() {
-    this.currentComputeBindeGroup =
-      this.currentComputeBindeGroup === this.computeBindGroupA
+    this.currentComputeBindGroup =
+      this.currentComputeBindGroup === this.computeBindGroupA
         ? this.computeBindGroupB
         : this.computeBindGroupA;
   }
 
+  /**
+   * Get GPU buffers needed for rendering.
+   * @returns Object containing simulation parameters, colors, and particle position buffers
+   */
   public getRenderContext(): RenderBuffers {
     return {
       simParamsBuffer: this.simParamsBuffer,
@@ -170,6 +194,10 @@ class Simulation {
     };
   }
 
+  /**
+   * Get GPU buffers needed for statistics computation.
+   * @returns Object containing stats buffer and staging buffer for CPU readback
+   */
   public getStatsBuffers(): StatsBuffers {
     return {
       statsBuffer: this.statsBuffer,
@@ -177,6 +205,10 @@ class Simulation {
     };
   }
 
+  /**
+   * Get GPU buffers for simulation output.
+   * @returns Object containing output buffer and staging buffer for CPU readback
+   */
   public getOutputBuffers(): OutputBuffers {
     return {
       outputBuffer: this.outputBuffer,
@@ -184,6 +216,10 @@ class Simulation {
     };
   }
 
+  /**
+   * Get the initial particle data as a Float32Array.
+   * @returns Initial particle positions and velocities
+   */
   public getParticleData(): Float32Array {
     return this.particleData;
   }
