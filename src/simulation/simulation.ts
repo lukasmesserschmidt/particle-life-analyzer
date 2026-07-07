@@ -16,7 +16,7 @@ import { createComputePipeline } from '../webgpu/pipelines';
 import { createBindGroup } from '../webgpu/bind_groups';
 import { computeShaderCode } from '../webgpu/shaders';
 
-import { ParticleDataGenerator } from './particle_system';
+import { ParticleDataGenerator } from './particle_data_generator';
 import { WORKGROUP_SIZE } from '../types';
 
 /**

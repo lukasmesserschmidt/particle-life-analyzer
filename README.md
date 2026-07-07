@@ -75,7 +75,7 @@ npm run preview
 The project is organized into several key modules:
 
 - **`simulation/`**: Core particle simulation logic and physics
-  - `particle_system.ts`: Particle data generation and initialization
+  - `particle_data_generator.ts`: Particle data generation and initialization
   - `simulation.ts`: Main simulation controller with WebGPU compute pipeline
   - `parameters.ts`: Simulation parameter interfaces
   - `output_buffers.ts`: GPU buffer management for simulation output
@@ -122,11 +122,3 @@ Three key metrics are tracked in real-time:
 WebGPU is required for this application. Check browser support at:
 
 - [WebGPU Browser Support](https://caniuse.com/webgpu)
-
-## License
-
-[Add your license here]
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues or pull requests.
