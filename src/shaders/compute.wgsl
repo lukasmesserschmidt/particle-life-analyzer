@@ -11,6 +11,10 @@ struct SimParams {
     particle_size: f32
 }
 
+struct Stats {
+    total_distance: array<f32>,
+}
+
 struct Particle {
     position: array<f32, MAX_DIM>,
     velocity: array<f32, MAX_DIM>
@@ -19,9 +23,10 @@ struct Particle {
 alias Relation = array<f32, MAX_GROUPS>;
 
 @group(0) @binding(0) var<uniform> sim_params: SimParams;
-@group(0) @binding(1) var<storage, read> relations: array<Relation>;
-@group(0) @binding(2) var<storage, read> particles_in: array<Particle>;
-@group(0) @binding(3) var<storage, read_write> particles_out: array<Particle>;
+@group(0) @binding(1) var<storage, read_write> stats: Stats;
+@group(0) @binding(2) var<storage, read> relations: array<Relation>;
+@group(0) @binding(3) var<storage, read> particles_in: array<Particle>;
+@group(0) @binding(4) var<storage, read_write> particles_out: array<Particle>;
 
 @compute @workgroup_size(32)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
@@ -48,6 +53,8 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let particles_per_group: u32 = particle_count / group_count;
     let group: u32 = index / particles_per_group;
 
+    var local_distance: f32 = 0.0;
+
     for (var i: u32 = 0; i < particle_count; i = i + 1) {
         if (i == index) {
             continue;
@@ -55,19 +62,20 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
         
         let reference_particle: Particle = particles_in[i];
         
-        // calculate squared euclidean distance first
+        // calculate euclidean distance
         var sum_sqr_dist: f32 = 0.0;
         for (var j: u32 = 0; j < n; j = j + 1) {
             var r_i: f32 = wrap_distance(reference_particle.position[j] - particle.position[j]);
             sum_sqr_dist = sum_sqr_dist + (r_i * r_i);
         }
+        let r: f32 = sqrt(sum_sqr_dist);
+
+        // accumulate stats locally
+        local_distance = local_distance + r;
         
-        // early exit using squared distance to avoid sqrt
-        if (sum_sqr_dist == 0.0 || sum_sqr_dist >= r_max_sq) {
+        if (r == 0.0 || r >= r_max) {
             continue;
         }
-        
-        let r: f32 = sqrt(sum_sqr_dist);
         
         // get relation
         let reference_group: u32 = i / particles_per_group;
@@ -103,6 +111,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     }
 
     particles_out[index] = particle;
+    
+    // write local accumulated distance to stats array
+    stats.total_distance[index] = local_distance;
 }
 
 fn force(r: f32, a: f32) -> f32 {

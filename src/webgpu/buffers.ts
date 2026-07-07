@@ -5,6 +5,16 @@ function createSimParamsBuffer(device: GPUDevice, size: number): GPUBuffer {
   });
 }
 
+function createStatsBuffer(device: GPUDevice, size: number): GPUBuffer {
+  return device.createBuffer({
+    size: size,
+    usage:
+      GPUBufferUsage.STORAGE |
+      GPUBufferUsage.COPY_DST |
+      GPUBufferUsage.COPY_SRC,
+  });
+}
+
 function createRelationBuffer(device: GPUDevice, size: number): GPUBuffer {
   return device.createBuffer({
     size: size,
@@ -42,6 +52,7 @@ function createStagingBuffer(device: GPUDevice, size: number): GPUBuffer {
 
 export {
   createSimParamsBuffer,
+  createStatsBuffer,
   createRelationBuffer,
   createColorBuffer,
   createInputBuffer,

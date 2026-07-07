@@ -34,7 +34,7 @@ fn vs_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
     
     let particle: Particle = particle_data[particle_index];
 
-    let corner_offsets = array(
+    let corner_offsets: array<vec2<f32>, 6> = array(
         vec2<f32>(-0.0005, -0.0005),
         vec2<f32>(0.0005, -0.0005),
         vec2<f32>(-0.0005, 0.0005),
