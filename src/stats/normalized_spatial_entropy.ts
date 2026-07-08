@@ -7,7 +7,7 @@
  */
 function calcNormalizedSpatialEntropy(
   positions: number[][],
-  kIntervals: number = 8,
+  kIntervals: number,
 ): number {
   const dimensions = positions[0].length;
   const particleCount = positions.length;

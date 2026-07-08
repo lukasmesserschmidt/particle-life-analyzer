@@ -15,6 +15,8 @@ export class Stats {
   private params: SimulationParams;
 
   private initialPositions: number[][];
+  private entropyHistory: number[];
+  private k: number;
 
   private statsBuffer: GPUBuffer;
   private statsStagingBuffer: GPUBuffer;
@@ -35,6 +37,10 @@ export class Stats {
       particleData,
       params.particleCount,
       params.dimensions,
+    );
+    this.entropyHistory = [];
+    this.k = Math.round(
+      Math.pow(this.params.particleCount, 1 / this.params.dimensions),
     );
 
     statsChart.data.labels = [];
@@ -57,6 +63,7 @@ export class Stats {
     );
     const normalizedSpatialEntropy = calcNormalizedSpatialEntropy(
       statsContext.currentPositions,
+      this.k,
     );
     const normalizedAverageDistance = calcNormalizedAverageDistance(
       statsContext.totalDistance,
@@ -64,9 +71,20 @@ export class Stats {
       this.params.dimensions,
     );
 
+    // track entropy history
+    this.entropyHistory.push(normalizedSpatialEntropy);
+    if (this.entropyHistory.length > 60) {
+      this.entropyHistory.shift();
+    }
+
+    // calculate moving average of entropy
+    const entropyMovingAverage =
+      this.entropyHistory.reduce((a, b) => a + b, 0) /
+      this.entropyHistory.length;
+
     // update charts
     statsChart.data.datasets[0].data.push(normalizedMsd);
-    statsChart.data.datasets[1].data.push(normalizedSpatialEntropy);
+    statsChart.data.datasets[1].data.push(entropyMovingAverage);
     statsChart.data.datasets[2].data.push(normalizedAverageDistance);
     statsChart.data.labels!.push(statsContext.currentTime);
     statsChart.options.scales!.x!.max = statsContext.currentTime;
