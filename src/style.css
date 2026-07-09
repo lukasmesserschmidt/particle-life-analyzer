@@ -29,6 +29,8 @@ hr {
     display: flex;
     height: 100vh;
     width: 100vw;
+    align-items: center;
+    justify-content: center;
 }
 
 .controls {
@@ -93,6 +95,10 @@ hr {
     display: none;
 }
 
+body.headless-mode {
+    background-color: white;
+}
+
 @media (max-width: 768px) {
     html, body {
         overflow: auto;
@@ -125,7 +131,7 @@ hr {
         height: 100vw;
         margin: 0 auto;
         flex-shrink: 0;
-        order: 1;
+        order: 2;
     }
 
     #headless-container {
@@ -133,6 +139,14 @@ hr {
         height: 100vw;
         margin: 0 auto;
         order: 3;
+    }
+
+    body:not(.headless-mode) #canvas {
+        order: 1;
+    }
+
+    body.headless-mode #headless-container {
+        order: 1;
     }
 
     #live-chart {

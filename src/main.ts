@@ -86,6 +86,7 @@ document.getElementById('headless')?.addEventListener('change', (e) => {
   document
     .getElementById('headless-container')
     ?.classList.toggle('hidden', !headless);
+  document.body.classList.toggle('headless-mode', headless);
   controller.init(params);
   if (!headless) {
     const params = getParamsFromInputs();
