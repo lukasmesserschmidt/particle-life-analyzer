@@ -35,7 +35,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     if (index >= sim_params.particle_count) {
         return;
     }
-    
+
     let group_count: u32 = sim_params.group_count;
     let particle_count: u32 = sim_params.particle_count;
     let n: u32 = sim_params.dimension;

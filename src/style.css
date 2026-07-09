@@ -14,7 +14,7 @@
 
 html, body {
     color: var(--color-neutral-900);
-    background-color: var(--color-neutral-900);
+    background-color: var(--color-neutral-50);
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     height: 100%;
@@ -56,6 +56,12 @@ hr {
     padding: 0.5rem;
 }
 
+.controls__headless-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 #apply {
     margin-top: 1rem;
     color: var(--color-neutral-50);
@@ -79,8 +85,12 @@ hr {
     min-height: 200px;
 }
 
-#canvas {
+#canvas, #headless-container {
     width: min(100vh, calc(100vw - 600px - 1rem));
     height: min(100vh, calc(100vw - 600px - 1rem));
     flex-shrink: 0;
+}
+
+.hidden {
+    display: none;
 }

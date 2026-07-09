@@ -1,9 +1,10 @@
-import type { SimulationParams } from './simulation/parameters';
-import type { StatsContext } from './stats/stats_context';
-import { Simulation } from './simulation/simulation';
-import { Renderer } from './render/renderer';
-import { Stats } from './stats/stats';
-import { getPositions } from './utils';
+import type { SimulationParams } from '../simulation/parameters';
+import type { StatsContext } from '../stats/stats_context';
+import { Simulation } from '../simulation/simulation';
+import { Renderer } from '../render/renderer';
+import { Stats } from '../stats/stats';
+import { getPositions } from '../utils';
+import { liveChart } from '../stats/live_chart';
 
 /**
  * Main application controller that coordinates simulation, rendering, and statistics.
@@ -21,6 +22,13 @@ class Controller {
   private params: SimulationParams;
   private currentTime: number;
   private animationFrameId: number;
+
+  private headlessData: {
+    msd: number[];
+    entropy: number[];
+    avgDistance: number[];
+    timeSteps: number[];
+  }[];
 
   /**
    * Initialize the controller with WebGPU canvas context and device.
@@ -82,14 +90,23 @@ class Controller {
   /**
    * Start the animation loop for continuous simulation updates.
    */
-  public startUpdateLoop() {
-    this.animationFrameId = requestAnimationFrame(this.update.bind(this));
+  public startSimulation() {
+    if (this.params.headless) {
+      this.simHeadlessIterations();
+    } else {
+      this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
+    }
+  }
+
+  private async updateLoop() {
+    await this.updateLive();
+    this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
   }
 
   /**
    * Main update loop: compute simulation, render, update statistics, and schedule next frame.
    */
-  private async update() {
+  private async updateLive() {
     const commandEncoder = this.device.createCommandEncoder();
 
     this.simulation.compute(commandEncoder);
@@ -143,15 +160,69 @@ class Controller {
       totalDistance,
     };
 
-    this.stats.update(statsContext);
+    this.stats.updateLiveChart(statsContext);
 
     this.currentTime += this.params.timeStep;
 
     // swap bind groups
     this.simulation.swapBindGroups();
     this.renderer.swapBindGroups();
+  }
 
-    this.animationFrameId = requestAnimationFrame(this.update.bind(this));
+  /**
+   * Fast update for headless mode: compute and swap buffers without CPU readback.
+   */
+  private async updateHeadless() {
+    const commandEncoder = this.device.createCommandEncoder();
+
+    this.simulation.compute(commandEncoder);
+
+    this.device.queue.submit([commandEncoder.finish()]);
+
+    this.currentTime += this.params.timeStep;
+
+    // swap bind groups
+    this.simulation.swapBindGroups();
+  }
+
+  private async simHeadlessIterations() {
+    this.headlessData = [];
+    this.stats.updateHeadlessChart([
+      {
+        msd: [],
+        entropy: [],
+        avgDistance: [],
+        timeSteps: [],
+      },
+    ]);
+
+    const frameCount =
+      this.params.headlessIterationTime / this.params.timeStep + 1;
+    const statsInterval = 10; // Read data every N timesteps instead of every timestep
+
+    for (let i = 0; i < this.params.headlessIterations; i++) {
+      this.init(this.params);
+
+      for (let j = 0; j < frameCount; j++) {
+        // Only read data and update stats at intervals
+        if (j % statsInterval === 0 || j === frameCount - 1) {
+          await this.updateLive();
+        } else {
+          await this.updateHeadless();
+        }
+      }
+
+      // save stats
+      this.headlessData.push({
+        msd: liveChart.data.datasets[0].data as number[],
+        entropy: liveChart.data.datasets[1].data as number[],
+        avgDistance: liveChart.data.datasets[2].data as number[],
+        timeSteps: liveChart.data.labels as number[],
+      });
+      this.stats.updateHeadlessChart(this.headlessData);
+
+      this.params.seed++;
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 import { getDevice } from './webgpu/device';
-import { Controller } from './controller';
+import { Controller } from './controller/controller';
 import type { SimulationParams } from './simulation/parameters';
 import { SPACE } from './types';
 
@@ -40,6 +40,15 @@ function getParamsFromInputs(): SimulationParams {
     particleSize: parseFloat(
       (document.getElementById('particleSize') as HTMLInputElement).value,
     ),
+    headless: (document.getElementById('headless') as HTMLInputElement).checked,
+    headlessIterations: parseInt(
+      (document.getElementById('headless-iterations') as HTMLInputElement)
+        .value,
+    ),
+    headlessIterationTime: parseInt(
+      (document.getElementById('headless-iteration-time') as HTMLInputElement)
+        .value,
+    ),
   };
 
   return params;
@@ -67,14 +76,32 @@ document.querySelectorAll('input[type="number"]').forEach((input) => {
   );
 });
 
+// Headless mode toggle
+document.getElementById('headless')?.addEventListener('change', (e) => {
+  const headless = (e.target as HTMLInputElement).checked;
+  document
+    .querySelector('.controls__headless')
+    ?.classList.toggle('hidden', !headless);
+  document.getElementById('canvas')?.classList.toggle('hidden', headless);
+  document
+    .getElementById('headless-container')
+    ?.classList.toggle('hidden', !headless);
+  controller.init(params);
+  if (!headless) {
+    const params = getParamsFromInputs();
+    controller.init(params);
+    controller.startSimulation();
+  }
+});
+
 // Apply button handler
 document.getElementById('apply')?.addEventListener('click', () => {
   const params = getParamsFromInputs();
   controller.init(params);
-  controller.startUpdateLoop();
+  controller.startSimulation();
 });
 
 // start animation
 const params = getParamsFromInputs();
 controller.init(params);
-controller.startUpdateLoop();
+controller.startSimulation();

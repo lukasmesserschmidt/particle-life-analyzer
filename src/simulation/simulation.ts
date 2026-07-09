@@ -17,7 +17,7 @@ import { createBindGroup } from '../webgpu/bind_groups';
 import { computeShaderCode } from '../webgpu/shaders';
 
 import { ParticleDataGenerator } from './particle_data_generator';
-import { WORKGROUP_SIZE } from '../types';
+import { MAX_DIM, WORKGROUP_SIZE } from '../types';
 
 /**
  * Core simulation engine using WebGPU compute shaders for particle physics.
@@ -93,7 +93,10 @@ class Simulation {
     );
     this.device.queue.writeBuffer(this.simParamsBuffer, 0, simParamsData);
 
-    this.statsBuffer = createStatsBuffer(this.device, params.particleCount * 4);
+    this.statsBuffer = createStatsBuffer(
+      this.device,
+      this.params.particleCount * 4,
+    );
 
     this.relationBuffer = createRelationBuffer(
       this.device,
@@ -118,6 +121,11 @@ class Simulation {
       this.device,
       this.particleData.byteLength,
     );
+    this.device.queue.writeBuffer(
+      this.outputBuffer,
+      0,
+      this.particleData.buffer,
+    );
 
     this.stagingBuffer = createStagingBuffer(
       this.device,
@@ -126,7 +134,7 @@ class Simulation {
 
     this.statsStagingBuffer = createStagingBuffer(
       this.device,
-      params.particleCount * 4,
+      this.params.particleCount * 4,
     );
 
     // create bind groups

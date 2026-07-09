@@ -1,10 +1,10 @@
 import Chart from 'chart.js/auto';
 
 const ctx = (
-  document.getElementById('stats-chart') as HTMLCanvasElement
+  document.getElementById('live-chart') as HTMLCanvasElement
 ).getContext('2d') as CanvasRenderingContext2D;
 
-const statsChart = new Chart(ctx, {
+const liveChart = new Chart(ctx, {
   type: 'line',
   data: {
     labels: [] as number[],
@@ -85,4 +85,4 @@ const statsChart = new Chart(ctx, {
   },
 });
 
-export { statsChart };
+export { liveChart };

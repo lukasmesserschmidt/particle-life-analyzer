@@ -8,4 +8,8 @@ export interface SimulationParams {
   frictionHalfLife: number;
   rMax: number;
   particleSize: number;
+
+  headless: boolean;
+  headlessIterations: number;
+  headlessIterationTime: number;
 }
