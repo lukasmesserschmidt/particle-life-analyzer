@@ -14,7 +14,7 @@
 
 html, body {
     color: var(--color-neutral-900);
-    background-color: var(--color-neutral-50);
+    background-color: black;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     height: 100%;
@@ -29,14 +29,12 @@ hr {
     display: flex;
     height: 100vh;
     width: 100vw;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
 }
 
 .controls {
-    flex: 0 0 600px;
-    width: 600px;
+    flex: 0 0 33.33%;
+    max-width: 33.33%;
+    width: 33.33%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -86,11 +84,58 @@ hr {
 }
 
 #canvas, #headless-container {
-    width: min(100vh, calc(100vw - 600px - 1rem));
-    height: min(100vh, calc(100vw - 600px - 1rem));
+    width: min(100vh, 66.67vw);
+    height: min(100vh, 66.67vw);
     flex-shrink: 0;
 }
 
 .hidden {
     display: none;
+}
+
+@media (max-width: 768px) {
+    html, body {
+        overflow: auto;
+    }
+
+    #app {
+        flex-direction: column;
+        height: auto;
+        width: 100%;
+        align-items: stretch;
+        padding: 0;
+    }
+
+    .controls {
+        flex: none;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        min-height: 100vh;
+        padding: 1rem;
+        order: 2;
+    }
+
+    .controls__spacer {
+        min-height: 100px;
+    }
+
+    #canvas {
+        width: 100vw;
+        height: 100vw;
+        margin: 0 auto;
+        flex-shrink: 0;
+        order: 1;
+    }
+
+    #headless-container {
+        width: 100vw;
+        height: 100vw;
+        margin: 0 auto;
+        order: 3;
+    }
+
+    #live-chart {
+        order: -1;
+    }
 }
