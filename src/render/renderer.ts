@@ -12,13 +12,13 @@ import { createDepthTexture } from '../webgpu/textures';
  */
 class Renderer {
   private device: GPUDevice;
-  private params: SimulationParams;
+  private params!: SimulationParams;
 
-  private depthTexture: GPUTexture;
+  private depthTexture!: GPUTexture;
   private renderPipeline: GPURenderPipeline;
-  private renderBindGroupA: GPUBindGroup;
-  private renderBindGroupB: GPUBindGroup;
-  private currentRenderBindGroup: GPUBindGroup;
+  private renderBindGroupA!: GPUBindGroup;
+  private renderBindGroupB!: GPUBindGroup;
+  private currentRenderBindGroup!: GPUBindGroup;
 
   /**
    * Initialize the renderer with WebGPU device and render pipeline.

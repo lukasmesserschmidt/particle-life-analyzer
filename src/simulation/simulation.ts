@@ -17,31 +17,31 @@ import { createBindGroup } from '../webgpu/bind_groups';
 import { computeShaderCode } from '../webgpu/shaders';
 
 import { ParticleDataGenerator } from './particle_data_generator';
-import { MAX_DIM, WORKGROUP_SIZE } from '../types';
+import { WORKGROUP_SIZE } from '../types';
 
 /**
  * Core simulation engine using WebGPU compute shaders for particle physics.
  * Manages GPU buffers, compute pipelines, and double-buffering for efficient particle updates.
  */
 class Simulation {
-  private params: SimulationParams;
+  private params!: SimulationParams;
 
   private device: GPUDevice;
 
-  private particleDataGenerator: ParticleDataGenerator;
-  private particleData: Float32Array;
-  private simParamsBuffer: GPUBuffer;
-  private statsBuffer: GPUBuffer;
-  private relationBuffer: GPUBuffer;
-  private colorBuffer: GPUBuffer;
-  private inputBuffer: GPUBuffer;
-  private outputBuffer: GPUBuffer;
-  private stagingBuffer: GPUBuffer;
-  private statsStagingBuffer: GPUBuffer;
+  private particleDataGenerator!: ParticleDataGenerator;
+  private particleData!: Float32Array;
+  private simParamsBuffer!: GPUBuffer;
+  private statsBuffer!: GPUBuffer;
+  private relationBuffer!: GPUBuffer;
+  private colorBuffer!: GPUBuffer;
+  private inputBuffer!: GPUBuffer;
+  private outputBuffer!: GPUBuffer;
+  private stagingBuffer!: GPUBuffer;
+  private statsStagingBuffer!: GPUBuffer;
   private computePipeline: GPUComputePipeline;
-  private computeBindGroupA: GPUBindGroup;
-  private computeBindGroupB: GPUBindGroup;
-  private currentComputeBindGroup: GPUBindGroup;
+  private computeBindGroupA!: GPUBindGroup;
+  private computeBindGroupB!: GPUBindGroup;
+  private currentComputeBindGroup!: GPUBindGroup;
 
   /**
    * Initialize the simulation with WebGPU device and compute pipeline.

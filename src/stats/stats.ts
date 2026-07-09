@@ -13,14 +13,14 @@ import { calcNormalizedAverageDistance } from './normalized_average_distance';
  * Manages Chart.js visualization and calculates normalized statistics.
  */
 export class Stats {
-  private params: SimulationParams;
+  private params!: SimulationParams;
 
-  private initialPositions: number[][];
-  private entropyHistory: number[];
-  private k: number;
+  private initialPositions!: number[][];
+  private entropyHistory!: number[];
+  private k!: number;
 
-  private statsBuffer: GPUBuffer;
-  private statsStagingBuffer: GPUBuffer;
+  private statsBuffer!: GPUBuffer;
+  private statsStagingBuffer!: GPUBuffer;
 
   /**
    * Initialize statistics with simulation parameters and initial particle data.

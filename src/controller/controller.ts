@@ -19,11 +19,11 @@ class Controller {
   private renderer: Renderer;
   private stats: Stats;
 
-  private params: SimulationParams;
-  private currentTime: number;
-  private animationFrameId: number;
+  private params!: SimulationParams;
+  private currentTime!: number;
+  private animationFrameId!: number;
 
-  private headlessData: {
+  private headlessData!: {
     msd: number[];
     entropy: number[];
     avgDistance: number[];
